@@ -3,14 +3,9 @@ const axios = require('axios');
 // const nodemon = require('nodemon');
 const cheerio = require('cheerio');
 const cors = require('cors');
-const puppeteer = require('puppeteer');
 
 const app = express();
 const PORT = 3000;
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; 
-const https = require("https");
-const agent = new https.Agent({ rejectUnauthorized: false });
 
 app.use(cors()); // CORS'u etkinleştir
 
@@ -101,57 +96,18 @@ const fetchAllPetrolOfisiData = async () => {
     return results; // Tüm sonuçları döndür
 };
 
-const fetchAllOpetData = async () => {
-    const results = [];
-    const urls = [
-        'https://www.opet.com.tr/akaryakit-fiyatlari',
-        // Diğer URL'ler buraya ekleyin
-    ];
+const fetchOpetData = async () => {
+    try {
+        const response = await axios.get('https://api.opet.com.tr/api/fuelprices/allprices');
+        const petrolPrices = response.data;
 
-    const browser = await puppeteer.launch();
-
-    for (const url of urls) {
-        try {
-            console.log(`Çalışılan URL: ${url}`);
-            const page = await browser.newPage();
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
-            await page.waitForSelector('.table-radius'); // Tablonun yüklendiğinden emin olun
-            
-            const html = await page.content();
-            const $ = cheerio.load(html);
-
-            $('.table-radius tbody tr').each((index, element) => {
-                let cityName = $(element).find('td').eq(0).find('span.ml-auto').text().trim();
-                let prices = {};
-
-                const fuelTypes = ['Kurşunsuz Benzin 95', 'Motorin UltraForce', 'Motorin EcoForce', 'Gazyağı', 'Fuel Oil', 'Yüksek Kükürtlü Fuel Oil', 'Kalorifer Yakıtı'];
-                fuelTypes.forEach((fuelType, idx) => {
-                    const price = $(element).find('td').eq(idx + 2).find('span.ml-auto').text().trim();
-                    if (price) {
-                        prices[fuelType] = price;
-                        console.log(`${fuelType}: ${price}`);
-                    } else {
-                        console.log(`${fuelType} bulunamadı`);
-                    }
-                });
-
-                results.push({ cityName, ...prices });
-            });
-
-            console.log(`Tüm elemanlar işlendi`);
-
-            await page.close();
-        } catch (error) {
-            console.error(`${url}: Hata: ${error.message}`);
-        }
+        // Verileri konsola yazdırma
+        console.log(JSON.stringify(petrolPrices, null, 2));
+        return petrolPrices;
+    } catch (error) {
+        console.error('Hata:', error.message);
     }
-
-    await browser.close();
-    console.log("İşlem tamamlandı. Sonuçlar:", results);
-    return results;
 };
-
-fetchAllOpetData();
 
 
 const bplink = "https://www.bp.com/bp-tr-pump-prices/api/PumpPrices";
@@ -235,7 +191,7 @@ app.get('/petrolOfisi-prices', async (req, res) => {
 
 app.get('/opet-prices', async (req, res) => {
     try {
-        const petrolPrices = await fetchAllOpetData();
+        const petrolPrices = await fetchOpetData();
         res.json(petrolPrices);
         console.log(petrolPrices);
     } catch (error) {
