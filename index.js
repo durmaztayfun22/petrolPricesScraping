@@ -133,19 +133,16 @@ const fetchOpetData = async () => {
 // });
 
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-const https = require("https");
-const agent = new https.Agent({ rejectUnauthorized: false });
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
 const cityLink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_price_cities";
 
 app.get("/total-prices", async (req, res) => {
   try {
-    const citiesResponse = await axios.get(cityLink, { httpsAgent: agent });
+    const citiesResponse = await axios.get(cityLink);
     const cities = citiesResponse.data;
 
     const requests = cities.map(city =>
-      axios.get(`${totallink}/${city.city_id}`, { httpsAgent: agent })
+      axios.get(`${totallink}/${city.city_id}`)
         .then(response => {
           const merkezData = response.data.find(
             (entry) => entry.county_name === "MERKEZ"
@@ -162,7 +159,7 @@ app.get("/total-prices", async (req, res) => {
     );
 
     const results = await Promise.all(requests);
-    const datas = results.filter(data => data != null); // Null olmayan sonuçları filtreliyoruz
+    const datas = results.filter(data => data != null);
 
     res.json(datas);
   } catch (error) {
@@ -170,6 +167,7 @@ app.get("/total-prices", async (req, res) => {
     res.status(500).send("Error occurred while fetching TOTAL prices");
   }
 });
+
 
 
 // Döviz verilerini almak için endpoint
