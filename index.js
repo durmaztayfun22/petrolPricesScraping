@@ -7,10 +7,6 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; 
-const https = require("https");
-const agent = new https.Agent({ rejectUnauthorized: false });
-
 app.use(cors()); // CORS'u etkinleştir
 
 // const Tcities = [
@@ -137,6 +133,9 @@ const fetchOpetData = async () => {
 // });
 
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+const https = require("https");
+const agent = new https.Agent({ rejectUnauthorized: false });
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
 const cityLink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_price_cities";
 
@@ -144,30 +143,34 @@ app.get("/total-prices", async (req, res) => {
   try {
     const citiesResponse = await axios.get(cityLink, { httpsAgent: agent });
     const cities = citiesResponse.data;
-    
-    const datas = [];
-    for (const city of cities) {
-      const response = await axios.get(`${totallink}/${city.city_id}`);
-      
-      const merkezData = response.data.find(
-        (entry) => entry.county_name === "MERKEZ"
-      );
 
-      if (merkezData) {
-        datas.push({
-          city_name: city.city_name,
-          city_id: city.city_id,
-          ...merkezData
-        });
-      }
-    }
-    
+    const requests = cities.map(city =>
+      axios.get(`${totallink}/${city.city_id}`, { httpsAgent: agent })
+        .then(response => {
+          const merkezData = response.data.find(
+            (entry) => entry.county_name === "MERKEZ"
+          );
+
+          if (merkezData) {
+            return {
+              city_name: city.city_name,
+              city_id: city.city_id,
+              ...merkezData
+            };
+          }
+        })
+    );
+
+    const results = await Promise.all(requests);
+    const datas = results.filter(data => data != null); // Null olmayan sonuçları filtreliyoruz
+
     res.json(datas);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while fetching TOTAL prices");
   }
 });
+
 
 // Döviz verilerini almak için endpoint
 app.get('/exchange-rates', async (req, res) => {
