@@ -141,13 +141,21 @@ const cityLink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_price_citie
 // Sertifika doğrulamayı devre dışı bırakan agent (geliştirme için)
 const agent = new https.Agent({ rejectUnauthorized: false });
 
+let cachedData = null;
+let lastFetchedTime = 0;
+const CACHE_DURATION = 10 * 60 * 1000; // 10 dakika
+
 app.get("/total-prices", async (req, res) => {
+  const now = Date.now();
+  
+  if (cachedData && now - lastFetchedTime < CACHE_DURATION) {
+    return res.json(cachedData); // Önbellekteki veriyi döner
+  }
+
   try {
-    // Şehir verisini alıyoruz
     const citiesResponse = await axios.get(cityLink, { httpsAgent: agent });
     const cities = citiesResponse.data;
 
-    // Tüm istekleri paralel olarak gönderiyoruz
     const requests = cities.map(city =>
       axios.get(`${totallink}/${city.city_id}`, { httpsAgent: agent })
         .then(response => {
@@ -165,9 +173,12 @@ app.get("/total-prices", async (req, res) => {
         })
     );
 
-    // Promise.all ile tüm isteklerin tamamlanmasını bekliyoruz
     const results = await Promise.all(requests);
     const datas = results.filter(data => data != null);
+
+    // Veriyi önbelleğe kaydet
+    cachedData = datas;
+    lastFetchedTime = now;
 
     res.json(datas);
   } catch (error) {
@@ -175,6 +186,7 @@ app.get("/total-prices", async (req, res) => {
     res.status(500).send("Error occurred while fetching TOTAL prices");
   }
 });
+
 
 
 
