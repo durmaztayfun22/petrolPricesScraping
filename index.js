@@ -7,26 +7,30 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; 
+const https = require("https");
+const agent = new https.Agent({ rejectUnauthorized: false });
+
 app.use(cors()); // CORS'u etkinleştir
 
-const Tcities = [
-    "ADANA", "ADIYAMAN", "AFYONKARAHİSAR", "AĞRI", "AKSARAY", 
-    "AMASYA", "ANKARA", "ANTALYA", "ARTVİN", "AYDIN", 
-    "BALIKESİR", "BARTIN", "BATMAN", "BAYBURT", "BİLECİK", 
-    "BİNGÖL", "BİTLİS", "BOLU", "BURDUR", "BURSA", 
-    "ÇANAKKALE", "ÇANKIRI", "ÇORUM", "DENİZLİ", "DİYARBAKIR", 
-    "DÜZCE", "EDİRNE", "ELAZIĞ", "ERZİNCAN", "ERZURUM", 
-    "ESKİŞEHİR", "GAZİANTEP", "GİRESUN", "GÜMÜŞHANE", "HAKKARİ", 
-    "HATAY", "ISPARTA", "İSTANBUL (ANADOLU)", "İSTANBUL (AVRUPA)", "İZMİR", 
-    "KAHRAMANMARAŞ", "KARABÜK", "KARAMAN", "KARS", "KASTAMONU", 
-    "KAYSERİ", "KİLİS", "KIRIKKALE", "KIRKLARELİ", "KIRŞEHİR", 
-    "KOCAELİ", "KONYA", "KÜTAHYA", "MALATYA", "MANİSA", 
-    "MARDİN", "MERSİN", "MUĞLA", "MUŞ", "NEVŞEHİR", 
-    "NİĞDE", "ORDU", "OSMANİYE", "RİZE", "SAKARYA", 
-    "SAMSUN", "ŞANLIURFA", "SİİRT", "SİNOP", "ŞIRNAK", 
-    "SİVAS", "TEKİRDAĞ", "TOKAT", "TRABZON", "TUNCELİ", 
-    "UŞAK", "VAN", "YALOVA", "YOZGAT", "ZONGULDAK"
-];
+// const Tcities = [
+//     "ADANA", "ADIYAMAN", "AFYONKARAHİSAR", "AĞRI", "AKSARAY", 
+//     "AMASYA", "ANKARA", "ANTALYA", "ARTVİN", "AYDIN", 
+//     "BALIKESİR", "BARTIN", "BATMAN", "BAYBURT", "BİLECİK", 
+//     "BİNGÖL", "BİTLİS", "BOLU", "BURDUR", "BURSA", 
+//     "ÇANAKKALE", "ÇANKIRI", "ÇORUM", "DENİZLİ", "DİYARBAKIR", 
+//     "DÜZCE", "EDİRNE", "ELAZIĞ", "ERZİNCAN", "ERZURUM", 
+//     "ESKİŞEHİR", "GAZİANTEP", "GİRESUN", "GÜMÜŞHANE", "HAKKARİ", 
+//     "HATAY", "ISPARTA", "İSTANBUL (ANADOLU)", "İSTANBUL (AVRUPA)", "İZMİR", 
+//     "KAHRAMANMARAŞ", "KARABÜK", "KARAMAN", "KARS", "KASTAMONU", 
+//     "KAYSERİ", "KİLİS", "KIRIKKALE", "KIRKLARELİ", "KIRŞEHİR", 
+//     "KOCAELİ", "KONYA", "KÜTAHYA", "MALATYA", "MANİSA", 
+//     "MARDİN", "MERSİN", "MUĞLA", "MUŞ", "NEVŞEHİR", 
+//     "NİĞDE", "ORDU", "OSMANİYE", "RİZE", "SAKARYA", 
+//     "SAMSUN", "ŞANLIURFA", "SİİRT", "SİNOP", "ŞIRNAK", 
+//     "SİVAS", "TEKİRDAĞ", "TOKAT", "TRABZON", "TUNCELİ", 
+//     "UŞAK", "VAN", "YALOVA", "YOZGAT", "ZONGULDAK"
+// ];
 
 // URL ve para birimleri
 const currencyData = [
@@ -110,27 +114,27 @@ const fetchOpetData = async () => {
 };
 
 
-const bplink = "https://www.bp.com/bp-tr-pump-prices/api/PumpPrices";
-app.get("/bp-prices", async (req, res) => {
-  try {
-    const datas = [];
-    for (let index = 0; index < Tcities.length; index++) {
-      const response = await axios.get(`${bplink}?strCity=${Tcities[index]}`);
-      const merkezData = response.data.find(
-        (district) => district.District === "MERKEZ"
-      ); // Get only the 'MERKEZ' district
-      if (merkezData) {
-        datas.push(merkezData); // Push only the 'MERKEZ' district data
-      } else {
-        datas.push(response.data[0]); // Push the first district if 'MERKEZ' is not found
-      }
-    }
-    res.json(datas);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error occurred while fetching BP prices");
-  }
-});
+// const bplink = "https://www.bp.com/bp-tr-pump-prices/api/PumpPrices";
+// app.get("/bp-prices", async (req, res) => {
+//   try {
+//     const datas = [];
+//     for (let index = 0; index < Tcities.length; index++) {
+//       const response = await axios.get(`${bplink}?strCity=${Tcities[index]}`);
+//       const merkezData = response.data.find(
+//         (district) => district.District === "MERKEZ"
+//       ); // Get only the 'MERKEZ' district
+//       if (merkezData) {
+//         datas.push(merkezData); // Push only the 'MERKEZ' district data
+//       } else {
+//         datas.push(response.data[0]); // Push the first district if 'MERKEZ' is not found
+//       }
+//     }
+//     res.json(datas);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Error occurred while fetching BP prices");
+//   }
+// });
 
 
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
