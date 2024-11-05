@@ -135,21 +135,24 @@ const fetchOpetData = async () => {
 
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-const https = require("https");
-const agent = new https.Agent({ rejectUnauthorized: false });
+
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
 
 app.get("/total-prices", async (req, res) => {
   try {
-    const response = await axios.get(totallink, { httpsAgent: agent });
+    const response = await axios.get(totallink);
     const data = response.data;
 
-    res.json(data); // Filtrelenmiş veriyi JSON olarak döndür
+    // "MERKEZ" olan verileri filtreleyelim
+    const merkezData = data.filter((entry) => entry.county_name === "MERKEZ");
+
+    res.json(merkezData); // Filtrelenmiş veriyi JSON olarak döndür
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while fetching TOTAL prices");
   }
 });
+
 
 
 
