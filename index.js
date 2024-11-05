@@ -7,6 +7,10 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; 
+const https = require("https");
+const agent = new https.Agent({ rejectUnauthorized: false });
+
 app.use(cors()); // CORS'u etkinleştir
 
 // const Tcities = [
@@ -133,61 +137,18 @@ const fetchOpetData = async () => {
 // });
 
 
-
-const https = require("https");
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
-const cityLink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_price_cities";
-
-// Sertifika doğrulamayı devre dışı bırakan agent (geliştirme için)
-const agent = new https.Agent({ rejectUnauthorized: false });
-
-let cachedData = null;
-let lastFetchedTime = 0;
-const CACHE_DURATION = 10 * 60 * 1000; // 10 dakika
 
 app.get("/total-prices", async (req, res) => {
-  const now = Date.now();
-  
-  if (cachedData && now - lastFetchedTime < CACHE_DURATION) {
-    return res.json(cachedData); // Önbellekteki veriyi döner
-  }
-
   try {
-    const citiesResponse = await axios.get(cityLink, { httpsAgent: agent });
-    const cities = citiesResponse.data;
-
-    const requests = cities.map(city =>
-      axios.get(`${totallink}/${city.city_id}`, { httpsAgent: agent })
-        .then(response => {
-          const merkezData = response.data.find(
-            (entry) => entry.county_name === "MERKEZ"
-          );
-
-          if (merkezData) {
-            return {
-              city_name: city.city_name,
-              city_id: city.city_id,
-              ...merkezData
-            };
-          }
-        })
-    );
-
-    const results = await Promise.all(requests);
-    const datas = results.filter(data => data != null);
-
-    // Veriyi önbelleğe kaydet
-    cachedData = datas;
-    lastFetchedTime = now;
-
-    res.json(datas);
+    const response = await axios.get(totallink, { httpsAgent: agent });
+    const data = response.data;
+    res.json(data); // Filtrelenmiş veriyi JSON olarak döndür
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while fetching TOTAL prices");
   }
 });
-
-
 
 
 // Döviz verilerini almak için endpoint
