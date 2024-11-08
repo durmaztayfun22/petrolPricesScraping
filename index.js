@@ -191,7 +191,7 @@ app.get('/po', async (req, res) => {
     }
 });
   
-app.get('/po/:city', async (req, res) => {
+app.get('/api/po/:city', async (req, res) => {
     try {
       const city = req.params.city.toUpperCase();
       const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices?city=${city}`);
@@ -237,7 +237,7 @@ app.get('/op', async (req, res) => {
     }
 });
 
-app.get('/op/:city', async (req, res) => {
+app.get('/api/op/:city', async (req, res) => {
     try {
       const city = req.params.city;
       const opetPrices = await axios.get('https://petrol-prices-scraping.vercel.app/opet-prices');

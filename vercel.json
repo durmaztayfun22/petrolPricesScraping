@@ -9,6 +9,14 @@
       {
         "src": "/(.*)",
         "dest": "/index.js"
+      },
+      {
+        "src": "/po/:city",
+        "dest": "/api/po/:city"
+      },
+      {
+        "src": "/op/:city",
+        "dest": "/api/op/:city"
       }
     ]
   }
