@@ -4,20 +4,10 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors');
 const _ = require('lodash');
-const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
 const app = express();
 const PORT = 3000;
 
-// Add the following line to wrap your application
-const apiHandler = express();
-apiHandler.use((req, res, next) => {
-  req.originalUrl = req.url;
-  req.url = req.url.replace(/\/index.js/, '');
-  next();
-});
-apiHandler.use(bodyParser.json());
-apiHandler.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(cors()); // CORS'u etkinleştir
 
 // const Tcities = [
@@ -279,6 +269,3 @@ app.listen(PORT, () => {
     console.log(`Sunucu http://localhost:${PORT} adresinde çalışıyor`);
     setInterval(fetchAllData, 10000); // Her 10 saniyede bir verileri güncelle
 });
-
-
-module.exports = apiHandler;
