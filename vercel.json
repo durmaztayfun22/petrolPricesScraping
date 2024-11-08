@@ -1,6 +1,14 @@
 {
-  "rewrites": [
-    { "source": "/opet-prices/op/:city", "destination": "/api/opet-prices/op/[city]" },
-    { "source": "/opet-prices/op", "destination": "/api/opet-prices/op" }
-  ]
-}
+    "builds": [
+      {
+        "src": "index.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/index.js"
+      }
+    ]
+  }
