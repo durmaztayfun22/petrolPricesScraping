@@ -9,6 +9,11 @@ const PORT = 3000;
 
 
 app.use(cors()); // CORS'u etkinleştir
+// Add the following snippet
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
+  next();
+});
 
 // const Tcities = [
 //     "ADANA", "ADIYAMAN", "AFYONKARAHİSAR", "AĞRI", "AKSARAY", 
