@@ -10,11 +10,5 @@
         "src": "/(.*)",
         "dest": "/index.js"
       }
-    ],
-    "rewrites": [
-    { "source": "/po", "destination": "/api/index.js" },
-    { "source": "/po/:city", "destination": "/api/index.js" },
-    { "source": "/op", "destination": "/api/index.js" },
-    { "source": "/op/:city", "destination": "/api/index.js" }
-  ]
+    ]
   }
