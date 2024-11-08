@@ -3,7 +3,7 @@ const axios = require('axios');
 // const nodemon = require('nodemon');
 const cheerio = require('cheerio');
 const cors = require('cors');
-
+const _ = require('lodash');
 const app = express();
 const PORT = 3000;
 
@@ -173,41 +173,46 @@ app.get('/petrolOfisi-prices', async (req, res) => {
     try {
         const petrolPrices = await fetchAllPetrolOfisiData();
         res.json(petrolPrices);
-        console.log(petrolPrices);
+        // console.log(petrolPrices);
     } catch (error) {
         console.error('Akaryakıt verileri alınamadı:', error);
         res.status(500).send('Akaryakıt verileri alınamadı.');
     }
 });
 
-// Tüm Petrol Ofisi verilerini almak için yeni bir endpoint
 app.get('/po', async (req, res) => {
-  try {
-    const response = await axios.get('https://petrol-prices-scraping.vercel.app/petrolOfisi-prices');
-    res.json(response.data);
-  } catch (error) {
-    console.error('Petrol Ofisi verileri alınamadı:', error);
-    res.status(500).send('Petrol Ofisi verileri alınamadı.');
-  }
-});
-
-// Şehre ait Petrol Ofisi verilerini almak için yeni bir endpoint
-app.get('/po/:city', async (req, res) => {
-  try {
-    const city = req.params.city.toUpperCase();
-    const response = await axios.get('https://petrol-prices-scraping.vercel.app/petrolOfisi-prices');
-    const cityData = response.data.find((item) => item.city.toUpperCase() === city);
-
-    if (cityData) {
-      res.json(cityData);
-    } else {
-      res.status(404).send('Şehir bulunamadı');
+    try {
+      const petrolPrices = await axios.get('https://petrol-prices-scraping.vercel.app/petrolOfisi-prices');
+      const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
+      res.json(plainPetrolPrices);
+    } catch (error) {
+      console.error('Akaryakıt verileri alınamadı:', error);
+      res.status(500).send('Akaryakıt verileri alınamadı.');
     }
-  } catch (error) {
-    console.error('Şehre ait Petrol Ofisi verileri alınamadı:', error);
-    res.status(500).send('Şehre ait Petrol Ofisi verileri alınamadı.');
-  }
 });
+  
+app.get('/po/:city', async (req, res) => {
+    try {
+      const city = req.params.city.toUpperCase();
+      const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices?city=${city}`);
+      const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
+  
+      // Filter results by city
+      const cityPetrolPrices = plainPetrolPrices.filter(p => p.city === city);
+  
+      if (cityPetrolPrices.length === 0) {
+        console.warn(`No petrol prices found for city ${city}`);
+        res.status(404).send(`No petrol prices found for city ${city}`);
+      } else {
+        res.json(cityPetrolPrices);
+      }
+    } catch (error) {
+      city = city || '<unknown>';
+      console.error(`Akaryakıt verileri ${city} için alınamadı:`, error);
+      res.status(500).send(`Akaryakıt verileri ${city} için alınamadı.`);
+    }
+});
+  
 
 
 app.get('/opet-prices', async (req, res) => {
@@ -220,6 +225,42 @@ app.get('/opet-prices', async (req, res) => {
         res.status(500).send('Akaryakıt verileri alınamadı.');
     }
 });
+
+app.get('/op', async (req, res) => {
+    try {
+      const petrolPrices = await axios.get('https://petrol-prices-scraping.vercel.app/opet-prices');
+      const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
+      res.json(plainPetrolPrices);
+    } catch (error) {
+      console.error('Akaryakıt verileri alınamadı:', error);
+      res.status(500).send('Akaryakıt verileri alınamadı.');
+    }
+});
+
+app.get('/op/:city', async (req, res) => {
+    try {
+      const city = req.params.city;
+      const opetPrices = await axios.get('https://petrol-prices-scraping.vercel.app/opet-prices');
+      const plainOpetPrices = _.cloneDeep(opetPrices.data);
+  
+      // Filter results by city
+      const cityOpetPrices = plainOpetPrices.filter(p => p.provinceName.toLowerCase() === city.toLowerCase());
+
+  
+      if (cityOpetPrices.length === 0) {
+        console.warn(`No petrol prices found for city ${city}`);
+        res.status(404).send(`No petrol prices found for city ${city}`);
+      } else {
+        res.json(cityOpetPrices[0].prices);
+      }
+    } catch (error) {
+        city = city || '<unknown>';
+        console.error(`Petrol verileri ${city} için alınamadı:`, error);
+        res.status(500).send(`Petrol verileri ${city} için alınamadı.`);
+      }
+  });
+  
+
 
 // Sunucuyu başlat
 app.listen(PORT, () => {
