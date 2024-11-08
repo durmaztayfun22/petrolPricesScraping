@@ -9,11 +9,6 @@ const PORT = 3000;
 
 
 app.use(cors()); // CORS'u etkinleştir
-// Add the following snippet
-app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self'");
-  next();
-});
 
 // const Tcities = [
 //     "ADANA", "ADIYAMAN", "AFYONKARAHİSAR", "AĞRI", "AKSARAY", 
@@ -187,7 +182,7 @@ app.get('/petrolOfisi-prices', async (req, res) => {
 
 app.get('/po', async (req, res) => {
     try {
-      const petrolPrices = await axios.get('https://petrol-prices-scraping.vercel.app/petrolOfisi-prices');
+      const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices`);
       const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
       res.json(plainPetrolPrices);
     } catch (error) {
@@ -233,7 +228,7 @@ app.get('/opet-prices', async (req, res) => {
 
 app.get('/op', async (req, res) => {
     try {
-      const petrolPrices = await axios.get('https://petrol-prices-scraping.vercel.app/opet-prices');
+      const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/opet-prices`);
       const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
       res.json(plainPetrolPrices);
     } catch (error) {
@@ -245,12 +240,11 @@ app.get('/op', async (req, res) => {
 app.get('/op/:city', async (req, res) => {
     try {
       const city = req.params.city;
-      const opetPrices = await axios.get('https://petrol-prices-scraping.vercel.app/opet-prices');
+      const opetPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/opet-prices`);
       const plainOpetPrices = _.cloneDeep(opetPrices.data);
   
       // Filter results by city
       const cityOpetPrices = plainOpetPrices.filter(p => p.provinceName.toLowerCase() === city.toLowerCase());
-
   
       if (cityOpetPrices.length === 0) {
         console.warn(`No petrol prices found for city ${city}`);
