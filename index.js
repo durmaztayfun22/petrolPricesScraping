@@ -219,7 +219,6 @@ app.get('/opet-prices', async (req, res) => {
     try {
         const petrolPrices = await fetchOpetData();
         res.json(petrolPrices);
-        console.log(petrolPrices);
     } catch (error) {
         console.error('Akaryakıt verileri alınamadı:', error);
         res.status(500).send('Akaryakıt verileri alınamadı.');

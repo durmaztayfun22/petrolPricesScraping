@@ -10,5 +10,9 @@
         "src": "/(.*)",
         "dest": "/index.js"
       }
+    ],
+    "rewrites": [
+      { "source": "/opet-prices/op/:city", "destination": "/api/opet-prices/op/[city]" },
+      { "source": "/opet-prices/op", "destination": "/api/opet-prices/op" }
     ]
   }
