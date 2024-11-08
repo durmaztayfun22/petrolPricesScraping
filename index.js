@@ -180,6 +180,36 @@ app.get('/petrolOfisi-prices', async (req, res) => {
     }
 });
 
+// Tüm Petrol Ofisi verilerini almak için yeni bir endpoint
+app.get('/po', async (req, res) => {
+  try {
+    const response = await axios.get('https://petrol-prices-scraping.vercel.app/petrolOfisi-prices');
+    res.json(response.data);
+  } catch (error) {
+    console.error('Petrol Ofisi verileri alınamadı:', error);
+    res.status(500).send('Petrol Ofisi verileri alınamadı.');
+  }
+});
+
+// Şehre ait Petrol Ofisi verilerini almak için yeni bir endpoint
+app.get('/po/:city', async (req, res) => {
+  try {
+    const city = req.params.city.toUpperCase();
+    const response = await axios.get('https://petrol-prices-scraping.vercel.app/petrolOfisi-prices');
+    const cityData = response.data.find((item) => item.city.toUpperCase() === city);
+
+    if (cityData) {
+      res.json(cityData);
+    } else {
+      res.status(404).send('Şehir bulunamadı');
+    }
+  } catch (error) {
+    console.error('Şehre ait Petrol Ofisi verileri alınamadı:', error);
+    res.status(500).send('Şehre ait Petrol Ofisi verileri alınamadı.');
+  }
+});
+
+
 app.get('/opet-prices', async (req, res) => {
     try {
         const petrolPrices = await fetchOpetData();
