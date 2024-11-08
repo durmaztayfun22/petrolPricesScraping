@@ -4,10 +4,20 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors');
 const _ = require('lodash');
+const bodyParser = require('body-parser');
+const fetch = require('node-fetch');
 const app = express();
 const PORT = 3000;
 
-
+// Add the following line to wrap your application
+const apiHandler = express();
+apiHandler.use((req, res, next) => {
+  req.originalUrl = req.url;
+  req.url = req.url.replace(/\/index.js/, '');
+  next();
+});
+apiHandler.use(bodyParser.json());
+apiHandler.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors()); // CORS'u etkinleştir
 
 // const Tcities = [
@@ -182,8 +192,8 @@ app.get('/petrolOfisi-prices', async (req, res) => {
 
 app.get('/po', async (req, res) => {
     try {
-      // const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices`);
-      const petrolPrices = await axios.get('http://localhost:3000/petrolOfisi-prices');
+      const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices`);
+      // const petrolPrices = await axios.get('http://localhost:3000/petrolOfisi-prices');
       const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
       res.json(plainPetrolPrices);
     } catch (error) {
@@ -195,8 +205,8 @@ app.get('/po', async (req, res) => {
 app.get('/po/:city', async (req, res) => {
     try {
       const city = req.params.city.toUpperCase();
-      // const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices?city=${city}`);
-      const petrolPrices = await axios.get(`http://localhost:3000/petrolOfisi-prices?city=${city}`);
+      const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/petrolOfisi-prices?city=${city}`);
+      // const petrolPrices = await axios.get(`http://localhost:3000/petrolOfisi-prices?city=${city}`);
       const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
   
       // Filter results by city
@@ -229,8 +239,8 @@ app.get('/opet-prices', async (req, res) => {
 
 app.get('/op', async (req, res) => {
     try {
-      // const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/opet-prices`);
-      const petrolPrices = await axios.get('http://localhost:3000/opet-prices');
+      const petrolPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/opet-prices`);
+      // const petrolPrices = await axios.get('http://localhost:3000/opet-prices');
       const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
       res.json(plainPetrolPrices);
     } catch (error) {
@@ -242,8 +252,8 @@ app.get('/op', async (req, res) => {
 app.get('/op/:city', async (req, res) => {
     try {
       const city = req.params.city;
-      // const opetPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/opet-prices`);
-      const opetPrices = await axios.get('http://localhost:3000/opet-prices');
+      const opetPrices = await axios.get(`https://petrol-prices-scraping.vercel.app/opet-prices`);
+      // const opetPrices = await axios.get('http://localhost:3000/opet-prices');
       const plainOpetPrices = _.cloneDeep(opetPrices.data);
   
       // Filter results by city
@@ -269,3 +279,6 @@ app.listen(PORT, () => {
     console.log(`Sunucu http://localhost:${PORT} adresinde çalışıyor`);
     setInterval(fetchAllData, 10000); // Her 10 saniyede bir verileri güncelle
 });
+
+
+module.exports = apiHandler;
