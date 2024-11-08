@@ -9,14 +9,12 @@
       {
         "src": "/(.*)",
         "dest": "/index.js"
-      },
-      {
-        "src": "/po/:city",
-        "dest": "/api/po/:city"
-      },
-      {
-        "src": "/op/:city",
-        "dest": "/api/op/:city"
       }
-    ]
+    ],
+    "rewrites": [
+    { "source": "/po", "destination": "/api/index.js" },
+    { "source": "/po/:city", "destination": "/api/index.js" },
+    { "source": "/op", "destination": "/api/index.js" },
+    { "source": "/op/:city", "destination": "/api/index.js" }
+  ]
   }
