@@ -181,39 +181,35 @@ app.get('/petrolOfisi-prices', async (req, res) => {
 });
 
 app.get('/po', async (req, res) => {
-    try {
+  try {
       const petrolPrices = await fetchAllPetrolOfisiData();
-      // const petrolPrices = await axios.get('http://localhost:3000/petrolOfisi-prices');
-      const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
-      res.json(plainPetrolPrices);
-    } catch (error) {
+      res.json(petrolPrices);
+  } catch (error) {
       console.error('Akaryakıt verileri alınamadı:', error);
       res.status(500).send('Akaryakıt verileri alınamadı.');
-    }
+  }
 });
-  
+
 app.get('/po/:city', async (req, res) => {
-    try {
+  try {
       const city = req.params.city.toUpperCase();
       const petrolPrices = await fetchAllPetrolOfisiData();
-      // const petrolPrices = await axios.get(`http://localhost:3000/petrolOfisi-prices?city=${city}`);
-      const plainPetrolPrices = _.cloneDeep(petrolPrices.data);
-  
-      // Filter results by city
-      const cityPetrolPrices = plainPetrolPrices.filter(p => p.city === city);
-  
+
+      // Şehre göre sonuçları filtrele
+      const cityPetrolPrices = petrolPrices.filter(p => p.city === city);
+
       if (cityPetrolPrices.length === 0) {
-        console.warn(`No petrol prices found for city ${city}`);
-        res.status(404).send(`No petrol prices found for city ${city}`);
+          console.warn(`No petrol prices found for city ${city}`);
+          res.status(404).send(`No petrol prices found for city ${city}`);
       } else {
-        res.json(cityPetrolPrices);
+          res.json(cityPetrolPrices);
       }
-    } catch (error) {
-      city = city || '<unknown>';
+  } catch (error) {
       console.error(`Akaryakıt verileri ${city} için alınamadı:`, error);
       res.status(500).send(`Akaryakıt verileri ${city} için alınamadı.`);
-    }
+  }
 });
+
   
 
 
