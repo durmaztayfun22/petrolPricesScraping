@@ -1,11 +1,11 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/po", "dest": "/api/index.js" },
-    { "src": "/po/(.*)", "dest": "/api/index.js" },
-    { "src": "/op", "dest": "/api/index.js" },
-    { "src": "/op/(.*)", "dest": "/api/index.js" },
-    { "src": "/total-prices", "dest": "/api/index.js" },
-    { "src": "/exchange-rates", "dest": "/api/index.js" }
+    { "src": "/po", "dest": "/index.js" },
+    { "src": "/po/(.*)", "dest": "/index.js" },
+    { "src": "/op", "dest": "/index.js" },
+    { "src": "/op/(.*)", "dest": "/index.js" },
+    { "src": "/total-prices", "dest": "/index.js" },
+    { "src": "/exchange-rates", "dest": "/index.js" }
   ]
 }
