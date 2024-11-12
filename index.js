@@ -140,7 +140,7 @@ const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
 
 app.get("/total-prices", async (req, res) => {
   try {
-    const response = await axios.get(totallink, { timeout: 15000 });
+    const response = await axios.get(totallink, { timeout: 150000 });
     const data = response.data;
 
     // "MERKEZ" olan verileri filtreleyelim
