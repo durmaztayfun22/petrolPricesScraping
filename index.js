@@ -153,7 +153,73 @@ app.get("/total-prices", async (req, res) => {
   }
 });
 
+app.get("/tot", async (req, res) => {
+    try {
+      const response = await axios.get(totallink);
+      const data = response.data;
+  
+      // "MERKEZ" olan verileri filtreleyelim
+      const merkezData = data.filter((entry) => entry.county_name === "MERKEZ");
+  
+      res.json(merkezData); // Filtrelenmiş veriyi JSON olarak döndür
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error occurred while fetching TOTAL prices");
+    }
+  });
 
+  app.get("/tot/:city", async (req, res) => {
+    const cityName = req.params.city.toUpperCase(); // Normalize city name to uppercase
+  
+    try {
+      const response = await axios.get(totallink);
+      const data = response.data;
+  
+      // List of valid county names
+      const validCountyNames = ["MERKEZ", "MERKEZ-AVRUPA", "MERKEZ-ANADOLU"];
+  
+      // Filter data to only include entries with valid county names and the specific city
+      const cityData = data.filter((entry) =>
+        validCountyNames.includes(entry.county_name) && entry.city_name.toUpperCase() === cityName
+      );
+  
+      if (cityData.length === 0) {
+        return res.status(404).send("City not found");
+      }
+  
+      res.json(cityData); // Return the filtered city-specific data
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error occurred while fetching TOTAL prices");
+    }
+  });
+
+  app.get("/tot/code/:code", async (req, res) => {
+    const cityCode = parseInt(req.params.code, 10); // Parse the city code to an integer
+  
+    try {
+      const response = await axios.get(totallink);
+      const data = response.data;
+  
+      // Filter data to only include entries with the specific city_code
+      const cityCodeData = data.filter((entry) =>
+        entry.city_code === cityCode
+      );
+  
+      if (cityCodeData.length === 0) {
+        return res.status(404).send("City code not found");
+      }
+  
+      res.json(cityCodeData);
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error occurred while fetching TOTAL prices");
+    }
+  });
+  
+  
 
 
 // Döviz verilerini almak için endpoint
