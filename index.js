@@ -153,6 +153,19 @@ app.get("/total-prices", async (req, res) => {
   }
 });
 
+app.get("/tot/all", async (req, res) => {
+  try {
+    const response = await axios.get(totallink);
+    const data = response.data; // Tüm veriyi al
+
+    res.json(data); // Tüm veriyi JSON olarak döndür
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error occurred while fetching ALL TOTAL prices");
+  }
+});
+
+
 app.get("/tot", async (req, res) => {
     try {
       const response = await axios.get(totallink);
