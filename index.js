@@ -134,13 +134,13 @@ const fetchOpetData = async () => {
 // });
 
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
 
 app.get("/total-prices", async (req, res) => {
   try {
-    const response = await axios.get(totallink, { timeout: 150000 });
+    const response = await axios.get(totallink);
     const data = response.data;
 
     // "MERKEZ" olan verileri filtreleyelim
@@ -155,7 +155,7 @@ app.get("/total-prices", async (req, res) => {
 
 app.get("/tot/all", async (req, res) => {
   try {
-    const response = await axios.get(totallink, { timeout: 15000 });
+    const response = await axios.get(totallink);
     const data = response.data; // Tüm veriyi al
 
     res.json(data); // Tüm veriyi JSON olarak döndür
@@ -168,7 +168,7 @@ app.get("/tot/all", async (req, res) => {
 
 app.get("/tot", async (req, res) => {
     try {
-      const response = await axios.get(totallink, { timeout: 15000 });
+      const response = await axios.get(totallink);
       const data = response.data;
   
       // "MERKEZ" olan verileri filtreleyelim
