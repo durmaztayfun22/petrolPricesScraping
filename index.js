@@ -134,7 +134,7 @@ const fetchOpetData = async () => {
 // });
 
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
 
 const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
 
