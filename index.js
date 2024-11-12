@@ -7,27 +7,7 @@ const _ = require('lodash');
 const app = express();
 const PORT = 3000;
 
-
 app.use(cors()); // CORS'u etkinleştir
-
-const Tcities = [
-    "ADANA", "ADIYAMAN", "AFYONKARAHİSAR", "AĞRI", "AKSARAY", 
-    "AMASYA", "ANKARA", "ANTALYA", "ARTVİN", "AYDIN", 
-    "BALIKESİR", "BARTIN", "BATMAN", "BAYBURT", "BİLECİK", 
-    "BİNGÖL", "BİTLİS", "BOLU", "BURDUR", "BURSA", 
-    "ÇANAKKALE", "ÇANKIRI", "ÇORUM", "DENİZLİ", "DİYARBAKIR", 
-    "DÜZCE", "EDİRNE", "ELAZIĞ", "ERZİNCAN", "ERZURUM", 
-    "ESKİŞEHİR", "GAZİANTEP", "GİRESUN", "GÜMÜŞHANE", "HAKKARİ", 
-    "HATAY", "ISPARTA", "İSTANBUL (ANADOLU)", "İSTANBUL (AVRUPA)", "İZMİR", 
-    "KAHRAMANMARAŞ", "KARABÜK", "KARAMAN", "KARS", "KASTAMONU", 
-    "KAYSERİ", "KİLİS", "KIRIKKALE", "KIRKLARELİ", "KIRŞEHİR", 
-    "KOCAELİ", "KONYA", "KÜTAHYA", "MALATYA", "MANİSA", 
-    "MARDİN", "MERSİN", "MUĞLA", "MUŞ", "NEVŞEHİR", 
-    "NİĞDE", "ORDU", "OSMANİYE", "RİZE", "SAKARYA", 
-    "SAMSUN", "ŞANLIURFA", "SİİRT", "SİNOP", "ŞIRNAK", 
-    "SİVAS", "TEKİRDAĞ", "TOKAT", "TRABZON", "TUNCELİ", 
-    "UŞAK", "VAN", "YALOVA", "YOZGAT", "ZONGULDAK"
-];
 
 // URL ve para birimleri
 const currencyData = [
@@ -111,157 +91,6 @@ const fetchOpetData = async () => {
 };
 
 
-const bplink = "https://www.bp.com/bp-tr-pump-prices/api/PumpPrices";
-app.get("/bp-prices", async (req, res) => {
-  try {
-    const datas = [];
-    for (let index = 0; index < Tcities.length; index++) {
-      const response = await axios.get(`${bplink}?strCity=${Tcities[index]}`);
-      const merkezData = response.data.find(
-        (district) => district.District === "MERKEZ"
-      ); // Get only the 'MERKEZ' district
-      if (merkezData) {
-        datas.push(merkezData); // Push only the 'MERKEZ' district data
-      } else {
-        datas.push(response.data[0]); // Push the first district if 'MERKEZ' is not found
-      }
-    }
-    res.json(datas);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error occurred while fetching BP prices");
-  }
-});
-
-app.get("/bp-prices/bp", async (req, res) => {
-  try {
-    const datas = [];
-    for (let index = 0; index < Tcities.length; index++) {
-      const response = await axios.get(`${bplink}?strCity=${Tcities[index]}`);
-      datas.push(response.data); // Tüm verileri ekliyoruz
-    }
-    res.json(datas);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error occurred while fetching BP prices");
-  }
-});
-
-
-app.get("/bp-prices/all", async (req, res) => {
-  try {
-    const response = await axios.get(bplink);
-    const data = response.data; // Tüm veriyi al
-
-    res.json(data); // Tüm veriyi JSON olarak döndür
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error occurred while fetching ALL TOTAL prices");
-  }
-});
-
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
-const totallink = "https://apimobiletest.oyakpetrol.com.tr/exapi/fuel_prices";
-
-app.get("/total-prices", async (req, res) => {
-  try {
-    const response = await axios.get(totallink);
-    const data = response.data;
-
-    // "MERKEZ" olan verileri filtreleyelim
-    const merkezData = data.filter((entry) => entry.county_name === "MERKEZ");
-
-    res.json(merkezData); // Filtrelenmiş veriyi JSON olarak döndür
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error occurred while fetching TOTAL prices");
-  }
-});
-
-app.get("/tot/all", async (req, res) => {
-  try {
-    const response = await axios.get(totallink);
-    const data = response.data; // Tüm veriyi al
-
-    res.json(data); // Tüm veriyi JSON olarak döndür
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error occurred while fetching ALL TOTAL prices");
-  }
-});
-
-
-app.get("/tot", async (req, res) => {
-    try {
-      const response = await axios.get(totallink);
-      const data = response.data;
-  
-      // "MERKEZ" olan verileri filtreleyelim
-      const merkezData = data.filter((entry) => entry.county_name === "MERKEZ");
-  
-      res.json(merkezData); // Filtrelenmiş veriyi JSON olarak döndür
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error occurred while fetching TOTAL prices");
-    }
-  });
-
-  app.get("/tot/:city", async (req, res) => {
-    const cityName = req.params.city.toUpperCase(); // Normalize city name to uppercase
-  
-    try {
-      const response = await axios.get(totallink);
-      const data = response.data;
-  
-      // List of valid county names
-      const validCountyNames = ["MERKEZ", "MERKEZ-AVRUPA", "MERKEZ-ANADOLU"];
-  
-      // Filter data to only include entries with valid county names and the specific city
-      const cityData = data.filter((entry) =>
-        validCountyNames.includes(entry.county_name) && entry.city_name.toUpperCase() === cityName
-      );
-  
-      if (cityData.length === 0) {
-        return res.status(404).send("City not found");
-      }
-  
-      res.json(cityData); // Return the filtered city-specific data
-  
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error occurred while fetching TOTAL prices");
-    }
-  });
-
-  app.get("/tot/code/:code", async (req, res) => {
-    const cityCode = parseInt(req.params.code, 10); // Parse the city code to an integer
-  
-    try {
-      const response = await axios.get(totallink);
-      const data = response.data;
-  
-      // Filter data to only include entries with the specific city_code
-      const cityCodeData = data.filter((entry) =>
-        entry.city_code === cityCode
-      );
-  
-      if (cityCodeData.length === 0) {
-        return res.status(404).send("City code not found");
-      }
-  
-      res.json(cityCodeData);
-  
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error occurred while fetching TOTAL prices");
-    }
-  });
-  
-  
-
-
 // Döviz verilerini almak için endpoint
 app.get('/exchange-rates', async (req, res) => {
     try {
@@ -316,9 +145,6 @@ app.get('/po/:city', async (req, res) => {
   }
 });
 
-  
-
-
 app.get('/opet-prices', async (req, res) => {
     try {
         const petrolPrices = await fetchOpetData();
@@ -358,9 +184,6 @@ app.get('/op/:city', async (req, res) => {
       res.status(500).send(`Petrol verileri ${city} için alınamadı.`);
   }
 });
-
-  
-
 
 // Sunucuyu başlat
 app.listen(PORT, () => {
