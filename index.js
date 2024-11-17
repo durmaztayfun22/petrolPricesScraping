@@ -125,6 +125,18 @@ app.get('/po', async (req, res) => {
   }
 });
 
+app.get('/po/AFYONKARAHISAR', async (req, res) => {
+    try {
+        const response = await fetch('https://petrol-prices-scraping.vercel.app/po/AFYON');
+        const petrolPrices = await response.json();
+        res.json(petrolPrices);
+    } catch (error) {
+        console.error('Akaryakıt verileri alınamadı:', error);
+        res.status(500).send('Akaryakıt verileri alınamadı.');
+    }
+});
+
+
 app.get('/po/:city', async (req, res) => {
   try {
       const city = req.params.city.toUpperCase();
