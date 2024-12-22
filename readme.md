@@ -2,7 +2,7 @@
 
 
 ## **PetrolPricesScraping** 🚀
-		Bu proje bazı akaryakıt istasyonlarının verileri JavaScript projesidir.
+Bu proje bazı akaryakıt istasyonlarının verileri JavaScript projesidir.
 ## **Özellikler** ✨
 
 -   Özellik 1: İki farklı akaryakıt istasyonlarının verileri gelir.
